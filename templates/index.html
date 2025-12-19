@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kawaii Booru Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="glass-header">
+            <div class="header-left">
+                <button id="burger-btn" class="burger-btn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <i class="fa-solid fa-heart"></i> BooruViewer
+                </div>
+            </div>
+
+            <!-- Search Area -->
+            <div class="search-wrapper">
+                <button class="mobile-search-toggle" id="mobile-search-toggle">
+                    <i class="fa-solid fa-search"></i>
+                </button>
+                <div class="search-container" id="search-container">
+                    <input type="text" id="search-input" placeholder="Search tags...">
+                    <button id="search-btn"><i class="fa-solid fa-search"></i></button>
+                </div>
+            </div>
+
+            <div class="controls">
+                <!-- Dropdown Source Picker -->
+                <div class="source-dropdown-container">
+                    <button class="source-dropdown-btn" id="source-dropdown-btn">
+                        <span id="current-source-text">Safebooru</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="source-dropdown-menu hidden" id="source-dropdown-menu">
+                        <div class="source-option active" data-source="safebooru">Safebooru</div>
+                        <div class="source-option" data-source="gelbooru">Gelbooru</div>
+                        <div class="source-option" data-source="rule34">Rule34</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside id="sidebar" class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="home"><i class="fa-solid fa-home"></i> Home</a>
+                <a href="#" class="nav-item" data-page="saved"><i class="fa-solid fa-bookmark"></i> Saved</a>
+                <a href="#" class="nav-item" data-page="profile"><i class="fa-solid fa-user"></i> Profile</a>
+            </nav>
+        </aside>
+
+        <!-- Views -->
+        <main class="content-area">
+            <!-- Home View (Gallery) -->
+            <section id="home-view" class="view active">
+                <main id="gallery" class="gallery-grid">
+                    <!-- Images will be injected here -->
+                </main>
+                <div id="loading" class="loading-spinner hidden">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+                </div>
+            </section>
+
+            <!-- Detailed Post View -->
+            <section id="post-view" class="view hidden">
+                <div class="post-container">
+                    <button id="back-to-gallery-btn" class="back-btn">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                    </button>
+
+                    <div class="post-content">
+                        <div class="post-image-container">
+                            <img id="post-image-detail" src="" alt="Post Image">
+                            <div class="image-overlay-hint">
+                                <i class="fa-solid fa-expand"></i> Click to Expand
+                            </div>
+                        </div>
+
+                        <div class="post-info">
+                            <div class="meta-info">
+                                <strong>Source:</strong> <span id="post-source-label">Unknown</span>
+                                <span style="margin: 0 5px;">|</span>
+                                <strong>Resolution:</strong> <span id="post-resolution"></span>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <button class="action-btn" id="like-btn">
+                                    <i class="fa-regular fa-heart"></i> Like
+                                </button>
+                                <button class="action-btn" id="save-btn">
+                                    <i class="fa-regular fa-bookmark"></i> Save
+                                </button>
+                                <button class="action-btn" id="download-btn">
+                                    <i class="fa-solid fa-download"></i> Save Image
+                                </button>
+                            </div>
+
+                            <h3>Tags</h3>
+                            <div id="post-tags" class="tags-container">
+                                <!-- Tags injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Saved View -->
+            <section id="saved-view" class="view hidden">
+                <div class="saved-tabs">
+                    <button class="tab-btn active" data-tab="saved">Saved</button>
+                    <button class="tab-btn" data-tab="liked">Liked</button>
+                </div>
+                <div id="saved-gallery" class="gallery-grid">
+                    <div class="placeholder-container">
+                        <i class="fa-solid fa-bookmark placeholder-icon"></i>
+                        <p>No saved posts yet</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile View -->
+            <section id="profile-view" class="view hidden">
+                <!-- Auth Forms -->
+                <div id="auth-section" class="auth-container hidden">
+                    <div id="login-form">
+                        <h2><i class="fa-solid fa-user-circle"></i> Login</h2>
+                        <div class="auth-form">
+                            <input type="text" id="login-username" class="auth-input" placeholder="Username">
+                            <input type="password" id="login-password" class="auth-input" placeholder="Password">
+                            <button class="auth-btn" id="login-submit-btn">Sign In</button>
+                        </div>
+                        <div class="auth-toggle">
+                            Don't have an account? <a id="show-register-btn">Register</a>
+                        </div>
+                    </div>
+                    <div id="register-form" class="hidden">
+                        <h2><i class="fa-solid fa-user-plus"></i> Register</h2>
+                        <div class="auth-form">
+                            <input type="text" id="register-username" class="auth-input" placeholder="Username">
+                            <input type="password" id="register-password" class="auth-input" placeholder="Password">
+                            <button class="auth-btn" id="register-submit-btn">Create Account</button>
+                        </div>
+                        <div class="auth-toggle">
+                            Already have an account? <a id="show-login-btn">Login</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Info -->
+                <div id="user-profile-section" class="profile-container hidden" style="position: relative;">
+                    <button id="open-settings-btn" class="settings-link-btn"
+                        style="position: absolute; top: 20px; right: 20px;">
+                        <i class="fa-solid fa-cog"></i>
+                    </button>
+                    <div class="profile-header">
+                        <div class="avatar-wrapper">
+                            <img id="profile-avatar" src="https://via.placeholder.com/150" alt="Avatar">
+                        </div>
+                        <h2 id="profile-nickname">User</h2>
+                        <button class="auth-btn" id="logout-btn"
+                            style="background: #ff6b6b; width: auto; padding: 8px 20px;">Logout</button>
+                    </div>
+                    <div class="recent-likes-section">
+                        <h3><i class="fa-solid fa-heart" style="color: #ff4757;"></i> Recent Likes</h3>
+                        <div class="recent-grid" id="recent-likes-grid">
+                            <p style="grid-column: 1/-1; text-align: center; color: #aaa;">No likes yet</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings View -->
+            <section id="settings-view" class="view hidden">
+                <div class="settings-container">
+                    <h2>Settings</h2>
+                    <div class="setting-item">
+                        <label>Images per row (Mobile)</label>
+                        <div class="range-slider">
+                            <input type="range" id="column-count-slider" min="2" max="5" value="3">
+                            <span id="column-count-value">3</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" data-page="home">
+                <i class="fa-solid fa-home"></i>
+            </a>
+            <a href="#" class="nav-item" data-page="saved">
+                <i class="fa-solid fa-bookmark"></i>
+            </a>
+            <a href="#" class="nav-item" data-page="profile">
+                <i class="fa-solid fa-user"></i>
+            </a>
+        </nav>
+
+        <!-- Lightbox Modal -->
+        <div id="lightbox" class="lightbox hidden">
+            <span class="close-btn">&times;</span>
+            <img class="lightbox-content" id="lightbox-img">
+            <div id="caption"></div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="toast hidden">
+            <i class="fa-solid fa-info-circle"></i> In Development
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
