@@ -37,6 +37,7 @@ const openSettingsBtn = document.getElementById('open-settings-btn');
 const columnCountSlider = document.getElementById('column-count-slider');
 const columnCountValue = document.getElementById('column-count-value');
 
+
 // State
 let page = 1;
 let isLoading = false;
@@ -608,6 +609,34 @@ if (lightbox) {
         if (e.target === lightbox) {
             lightbox.classList.add('hidden');
             if (lightboxImg) lightboxImg.src = '';
+        }
+    });
+}
+
+if (editAvatarBtn) {
+    editAvatarBtn.addEventListener('click', async () => {
+        const url = prompt("Please enter the URL for your new avatar image:");
+        if (url) {
+            try {
+                const res = await fetch('/api/user/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ avatar_url: url })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    currentUser.avatar = data.avatar;
+                    // Update UI immediately
+                    if (profileAvatar) profileAvatar.src = data.avatar;
+                    showToast('Avatar updated!');
+                } else {
+                    showToast('Failed to update avatar');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Error updating avatar');
+            }
         }
     });
 }

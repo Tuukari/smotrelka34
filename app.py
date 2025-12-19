@@ -121,6 +121,16 @@ def get_current_user():
         })
     return jsonify({'is_logged_in': False})
 
+@app.route('/api/user/update', methods=['POST'])
+@login_required
+def update_user():
+    data = request.json
+    if 'avatar_url' in data:
+        current_user.avatar_url = data['avatar_url']
+        db.session.commit()
+        return jsonify({'message': 'Profile updated', 'avatar': current_user.avatar_url})
+    return jsonify({'error': 'No data provided'}), 400
+
 @app.route('/api/posts')
 def get_posts():
     source = request.args.get('source', 'safebooru')
